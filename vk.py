@@ -8,7 +8,6 @@ import requests
 class vkapi:
     def __init__(self, token):
         self.token = token
-        self.data = None
         self.update = {'v':'5.131', 'access_token': self.token}
 
     def get(self, method, params, paramsUp=1):
@@ -19,6 +18,10 @@ class vkapi:
 
     def GetLP(self):
         self.data = requests.get("https://api.vk.com/method/groups.getLongPollServer", params={'group_id': '202800459', 'access_token': self.token, 'v': '5.131'}).json()
+        
+        if 'failed' in self.data:
+            print("Failed in self.data, retrying...")
+            self.GetLP()
 
     def ListenLP(self):
        events = requests.get(self.data['response']['server'], params={'act': 'a_check', 'ts': self.data['response']['ts'], 'key': self.data['response']['key'], 'wait': 40}).json()
